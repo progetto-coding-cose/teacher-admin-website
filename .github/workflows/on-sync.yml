@@ -1,0 +1,25 @@
+name: 'Deploy to Netlify'
+
+on:
+  push:
+
+jobs:
+  deploy:
+    name: 'Deploy to Netlify'
+    runs-on: ubuntu-latest
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+    steps:
+      - uses: actions/checkout@v4
+        #with:
+        #  lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: yarn install
+      - name: Netlify deploy
+        run: yarn netlify deploy --build --alias ${{ env.BRANCH_NAME }}
+        timeout-minutes: 1
